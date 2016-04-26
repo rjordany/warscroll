@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>WarScroll</title>
+    <link rel="stylesheet" href="assets/components/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="assets/css/main.css"/>
+
+</head>
+<body>
+
+<div class="page-content">
+    <div class="main" id="main">
+        <div class="page page1" data-id="home">
+
+
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-6">
+                        <h1>Home</h1>
+                        <p>texto de apoio de teste</p>
+                    </div>
+                    <div class="col-xs-6">
+                        <h2>Coluna 6 do bootstrap</h2>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="page page2 " data-pin="intpage-base"   data-id="produtos">
+            <div class="intpage-base" id="intpage-base">
+                <div class="intpage intpage1">
+
+                    <h1>Produtos</h1>
+                    <p>texto de apoio de teste</p>
+                </div>
+                <div class="intpage intpage1">
+
+                    <h1>up1</h1>
+                    <p>texto de apoio de teste</p>
+                </div>
+                <div class="intpage intpage2">
+
+                    <h1>up2</h1>
+                    <p>texto de apoio de teste</p>
+                </div>
+                <div class="intpage intpage3">
+
+                    <h1>up3</h1>
+                    <p>texto de apoio de teste</p>
+                </div>
+            </div>
+        </div>
+        <div class="page page3"  data-id="ondecomprar">
+
+            <h1>Onde comprar</h1>
+            <p>texto de apoio de teste</p>
+        </div>
+        <div class="page page4"  data-id="empresa">
+
+            <h1>Empresa</h1>
+            <p>texto de apoio de teste</p>
+        </div>
+        <div class="page page5"  data-id="contato"  >
+            <h1>Contato</h1>
+            <p>texto de apoio de teste</p>
+        </div>
+
+
+    </div>
+</div>
+
+<div class="scrollbase" id="scrollbase">
+
+</div>
+
+
+<script src="assets/components/jquery/dist/jquery.min.js"></script>
+<script>
+
+    var winW =0;
+    var winH =0;
+    var totalPaginas;
+    var didScroll = false;
+
+    $(document).ready(function(){
+        totalPaginas = $('.page').length;
+
+        $(window).resize(organizar);
+        organizar();
+
+        startScroll();
+        $(window).scroll(scrollMove);
+        // window.onscroll = scrollMove;
+        scrollMove();
+    });
+
+    function organizar(){
+        console.log('organizando');
+        winW = $(window).width();
+        winH = $(window).height();
+        startScroll();
+    }
+
+    /* function ativandoScroll() {
+     didScroll = true;
+     }
+
+     setInterval(function() {
+     if(didScroll) {
+     didScroll = false;
+     console.log('You scrolled');
+     scrollMove();
+     }
+     }, 100);*/
+
+
+    var pinRemove =0;
+    function scrollMove(){
+        var scroll = $(window).scrollTop();
+        var posX = -1*scroll;
+        var chave = true;
+        var pagePinX = 0
+        var pinAtivo = null;
+        var chavepin = true;
+        pinRemove = 0;
+
+        for(var a=0; a < scrollPosition.length; a++){
+            var cod = scrollPosition[a]['cod'];
+            var id = scrollPosition[a]['id'];
+            var objY = scrollPosition[a]['objY'];
+
+            var objYLimit = objY+winW;
+
+            var pin = scrollPosition[a]['pin'];
+            var pinH = scrollPosition[a]['pinH'];
+            var pinScroll = scrollPosition[a]['pinScroll'];
+
+            if(pin){
+                objYLimit = ((objY+pinH)-winH)+winW;
+            }
+
+
+            if(scroll>=objY && scroll<=objYLimit){
+                pinRemove = pinScroll;
+                chavepin = false;
+                if(pin){
+
+                  //  console.log(objYLimit-winW);
+
+                    if(scroll >= (objYLimit-winW)){
+                        chave = true;
+                        pinRemove +=-winH;
+                    } else {
+                        pinAtivo = pin;
+                        pagePinX = objY;
+                        $('#main').css('left',(-1*objY)+'px');
+                        chave = false;
+                    }
+                }
+
+            }
+
+            if(chavepin){
+              //  pinRemove += (pinH+winW+winH);
+            }
+        }
+
+        if(chave){
+            $('#main').css('left',( posX + pinRemove ) + 'px');
+        } else{
+            var posPinY = (-1*(scroll-pagePinX));
+            $('#'+pinAtivo).css('top',posPinY+'px');
+        }
+    }
+
+    var scrollPosition =[];
+
+    function startScroll(){
+
+        scrollPosition =[];
+        var pagesWidth = (winW *totalPaginas);
+        var scrollY = (pagesWidth+(winH))-winW;
+        var scrollTotal =0;
+        var pinScroll = 0;
+        $('.page').each(function(index){
+
+            var pin = $(this).attr('data-pin');
+            var cod = index;
+            var id = $(this).attr('data-id');
+            var interna = 0;
+            var addWidth = 0;
+
+            if(pin){
+                interna = $('#'+pin).height();
+                addWidth = winW;
+                pinScroll += (interna );
+            }
+
+            var objLimit = scrollTotal + interna;
+            var item = {
+                'cod':cod,
+                'id':id,
+                'objY':scrollTotal,
+                'pin': pin,
+                'pinH': interna,
+                'pinScroll':pinScroll,
+                'objLimit':objLimit
+            };
+            scrollTotal += (winW)+(interna-addWidth);
+            scrollPosition.push(item);
+            if(pin){
+                pinScroll +=-winH;
+            }
+
+            $(this).css('width',winW+'px');
+        });
+        $('#main').width(pagesWidth);
+        $('#scrollbase').height(scrollTotal);
+
+        console.log(scrollPosition);
+
+    }
+
+
+
+</script>
+</body>
+</html>
